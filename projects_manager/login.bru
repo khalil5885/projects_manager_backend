@@ -1,0 +1,31 @@
+meta {
+  name: login
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://127.0.0.1:8000/login
+  body: json
+  auth: inherit
+}
+
+headers {
+  Accept: application/json
+  X-Requested-With: XMLHttpRequest
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    
+    "email": "admin231@gmail.com",
+    "password": "khalil123",
+    "password_confirmation": "khalil123"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
