@@ -5,9 +5,9 @@ meta {
 }
 
 post {
-  url: 127.0.0.1:8000/register
+  url: 127.0.0.1:8000/admin/users
   body: json
-  auth: inherit
+  auth: bearer
 }
 
 headers {
@@ -16,13 +16,17 @@ headers {
   Content-Type: application/json
 }
 
+auth:bearer {
+  token: eyJpdiI6ImRiVWJTTzZMV2ZuOXllcXFId0R2WXc9PSIsInZhbHVlIjoibTV2RE01ci9Oc0J0bm9qQmNxY3pMKzBucEQrVEY5aGRVczJqZWxRTTRtQThXMFNkVkwya01qSWw5b3U4UDdPUmV5MGtMYldoVHFHdW9vR2l1Q1EwZms4alR2VXJYMnhRVXBRNWUybHV3TGZDenY1TmpQYjJiNGViWUJNTjA4L2oiLCJtYWMiOiJjNDYyOGZlY2MyZTFlODNkNTJlOTYxOGM2ZjU5MDhlZTRmNWRmMGE5MTk3MzEyYTdiNmYwMzZhY2Q2MzA4YTcxIiwidGFnIjoiIn0%3D
+}
+
 body:json {
   {
-    "name": "Khalil Admin",
-    "email": "khalil@gmail.com",
-    "password": "password123",
-    "password_confirmation": "password123"
+    "name": "Employee Two",
+    "email": "kablouti.fady01@gmail.com",
+    "role": "employee"
   }
+  
 }
 
 settings {
