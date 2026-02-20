@@ -342,6 +342,23 @@ project_manager/
 
 ## Recent Changes Log
 
+### February 21, 2026 - Auth Cleanup & Planning
+- **Removed RegisteredUserController** from auth routes (redundant with admin-only UserController)
+- **Cleaned up auth.php** - Now only contains public authentication flows (login, password reset, email verify, logout)
+- **Identified auth gaps** - MustVerifyEmail interface and role field handling for future implementation
+- **Route organization clarified** - auth.php for auth, web.php for app routes, api.php for optional JSON endpoints
+
+### February 20, 2026 - Bug Fixes & Code Review
+- **Fixed User Model:** Changed `casts()` method to `protected $casts` property
+  - Issue: Eloquent was ignoring the method; mass assignment and casting not working
+  - This ensures password hashing and email_verified_at datetime casting apply correctly
+- **Fixed task_employees Migration:** Corrected pivot table structure
+  - Removed incorrect `project_id` column
+  - Added proper `user_id` foreign key to establish Task ↔ User many-to-many relationship
+  - Added foreign key constraints with cascade delete for referential integrity
+  - Added unique composite key `(task_id, user_id)` to prevent duplicate assignments
+- **Code Review:** All models and migrations validated for consistency and correctness
+
 ### February 19-20, 2026
 - Created ProjectMembers table for team management
 - Finalized database schema with all four core tables
@@ -350,6 +367,32 @@ project_manager/
 - Configured mail queue for welcome emails
 - Established Inertia.js + React frontend setup
 - Created basic route structure for authentication and admin panel
+
+---
+
+## TODO - Tomorrow (February 22, 2026)
+
+### High Priority - Start Here
+- [ ] Implement Projects CRUD API endpoints
+  - POST `/projects` - Create new project
+  - GET `/projects` - List user's projects
+  - GET `/projects/{id}` - Get project details
+  - PUT `/projects/{id}` - Update project
+  - DELETE `/projects/{id}` - Delete project
+- [ ] Implement Tasks CRUD API endpoints
+  - POST `/projects/{projectId}/tasks` - Create task
+  - GET `/projects/{projectId}/tasks` - List tasks
+  - GET `/tasks/{id}` - Get task details
+  - PUT `/tasks/{id}` - Update task
+  - DELETE `/tasks/{id}` - Delete task
+- [ ] Add authorization checks
+  - Users can only access/modify own projects
+  - Users can only manage tasks in projects they belong to
+
+### Medium Priority - After CRUD Works
+- [ ] Create Project management frontend pages
+- [ ] Implement ProjectMembers management endpoints
+- [ ] Add project status workflow validation
 
 ---
 
@@ -371,3 +414,8 @@ Testing:             ░░░░░░░░░░░░░░░░░░░ 0
 
 **Last Updated:** February 20, 2026  
 **Status:** Ready for API endpoint implementation phase
+1. Routes (URL design) → What URLs exist?
+2. Controllers → What handles each URL?
+3. Requests (validation) → What input is allowed?
+4. Resources (responses) → What output format?
+5. Tests → Does it all work?
