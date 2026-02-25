@@ -11,12 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('task_employees', function (Blueprint $table) {
+        Schema::create('project_members', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('task_id')->constrained('tasks')->cascadeOnDelete();
+            $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->unique(['task_id','user_id']);
+            $table->enum('role',['client','manager','developer','viewer']);
             $table->timestamps();
+            
+            $table->unique(['project_id', 'user_id']);
+            $table->index('user_id');
         });
     }
 
@@ -25,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('task_employees');
+        Schema::dropIfExists('project_members');
     }
 };
