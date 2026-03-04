@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,16 +14,16 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->enum('status', ['pending', 'active', 'completed'])->index();
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->foreignId('owner_id')
-            ->nullable()
-                ->constrained('users')
-                ->nullOnDelete();
-            $table->softDeletes(); 
+            $table->enum('status', ['pending', 'in_progress', 'completed', 'on_hold'])
+                ->default('pending')->index();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->foreignId('owner_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('created_by')->constrained('users');
+            $table->foreignId('type_id')->nullable()->constrained('project_types')->nullOnDelete();
+            $table->softDeletes();
             $table->timestamps();
-            
+
             $table->index('owner_id');
         });
     }

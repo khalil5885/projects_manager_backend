@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role'
+        'global_role',
     ];
 
     /**
@@ -43,11 +43,46 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-    public function projects(){
-        return $this->belongsToMany(Project::class,'project_members');
-    }
-    public function tasks(){
-        return $this->belongsToMany(Task::class,'task_employees');
 
+    public function isAdmin(): bool
+    {
+        return $this->global_role === 'admin';
     }
+    public function isEmployee(): bool
+    {
+        return $this->global_role === 'employee';
+    }
+    public function isClient(): bool
+    {
+        return $this->global_role === 'client';
+    }
+
+    public function ownedProjects()
+    {
+        return $this->hasMany(Project::class, 'owner_id');
+    }
+
+    public function memberProjects()
+    {
+        return $this->belongsToMany(Project::class, 'project_members', 'user_id', 'project_id')
+            ->withPivot('project_role')
+            ->withTimestamps();
+    }
+    public function assignedTasks()
+    {
+        return $this->hasMany(Task::class, 'assigned_to');
+    }
+    public function taskComments()
+    {
+        return $this->hasMany(TaskComment::class, 'user_id');
+    }
+    public function projectComments()
+    {
+        return $this->hasMany(ProjectComment::class, 'user_id');
+    }
+    public function accessTokens()
+    {
+        return $this->hasMany(ClientAccessToken::class, 'client_id');
+    }
+
 }

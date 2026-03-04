@@ -1,6 +1,12 @@
 import { Head, Link } from '@inertiajs/react';
 
-export default function Welcome({ auth, laravelVersion, phpVersion }) {
+export default function Welcome({
+    auth,
+    canLogin,
+    canRegister,
+    laravelVersion,
+    phpVersion,
+}) {
     const handleImageError = () => {
         document
             .getElementById('screenshot-container')
@@ -26,6 +32,8 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         <header className="grid grid-cols-2 items-center gap-2 py-10 lg:grid-cols-3">
                             <div className="flex lg:col-start-2 lg:justify-center">
                                 <svg
+
+
                                     className="h-12 w-auto text-white lg:h-16 lg:text-[#FF2D20]"
                                     viewBox="0 0 62 65"
                                     fill="none"
@@ -47,24 +55,20 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     </Link>
                                 ) : (
                                     <>
-                                        <Link
-                                            href={route('login')}
-                                            className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-                                        >
-                                            Log in
-                                        </Link>
-                                        <Link
-                                            href={route('register')}
-                                            className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-                                        >
-                                            Register
-                                        </Link>
+                                        {canLogin && (
+                                            <Link
+                                                href={route('login')}
+                                                className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
+                                            >
+                                                Log in
+                                            </Link>
+                                        )}
                                     </>
                                 )}
                             </nav>
                         </header>
 
-                        <main className="mt-6">
+                        {false && (<main className="mt-6">
                             <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
                                 <a
                                     href="https://laravel.com/docs"
@@ -111,7 +115,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                     />
                                                 </svg>
                                             </div>
-
                                             <div className="pt-3 sm:pt-5 lg:pt-0">
                                                 <h2 className="text-xl font-semibold text-black dark:text-white">
                                                     Documentation
@@ -162,7 +165,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                             </g>
                                         </svg>
                                     </div>
-
                                     <div className="pt-3 sm:pt-5">
                                         <h2 className="text-xl font-semibold text-black dark:text-white">
                                             Laracasts
@@ -211,7 +213,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                             </g>
                                         </svg>
                                     </div>
-
                                     <div className="pt-3 sm:pt-5">
                                         <h2 className="text-xl font-semibold text-black dark:text-white">
                                             Laravel News
@@ -349,6 +350,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 </div>
                             </div>
                         </main>
+                        )}
 
                         <footer className="py-16 text-center text-sm text-black dark:text-white/70">
                             Laravel v{laravelVersion} (PHP v{phpVersion})
