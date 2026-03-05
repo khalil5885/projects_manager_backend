@@ -129,7 +129,7 @@ export default function UserCreate() {
                                     </div>
                                     {errors.global_role && (
                                         <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
-                                            <span>⚠</span> {errors.role}
+                                            <span>⚠</span> {errors.global_role}
                                         </p>
                                     )}
                                 </div>

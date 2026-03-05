@@ -16,10 +16,10 @@ class Task extends Model
         'assigned_to',
         'status',
         'priority',
-        'due_date',       // ← was start_date/end_date
+        'due_date',
     ];
 
-    // ── Relationships ─────────────────────────────────────
+
 
     public function project()
     {

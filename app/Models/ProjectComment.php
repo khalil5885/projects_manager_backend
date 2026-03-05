@@ -6,5 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProjectComment extends Model
 {
-    //
+    protected $fillable = [
+        "user_id",
+        "project_id",
+        "type",
+        "body"
+
+    ];
+    public function user()
+    {
+        return $this->belongsTo(User::class, "user_id");
+    }
+    public function project()
+    {
+        return $this->belongsTo(Project::class, "project_id");
+    }
 }
