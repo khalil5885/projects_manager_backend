@@ -2,52 +2,57 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 class Project extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        "name",
-        "description",
-        "status",
-        "start_date",
-        "end_date",
-        "owner_id",
-        "created_by",
-        "type_id"
+        'name',
+        'description',
+        'status',
+        'client_id',
+        'project_type_id',
+        'start_date',
+        'end_date',
+        'created_by',
     ];
+
     protected $casts = [
-        "start_date" => "date",
-        "end_date" => "date"
+        'start_date' => 'date',
+        'end_date'   => 'date',
     ];
-    public function projectComments()
+
+    // Relationships
+    public function client()
     {
-        return $this->hasMany(ProjectComment::class);
+        return $this->belongsTo(User::class, 'client_id');
     }
-    public function projectsOwner()
+
+    public function projectType()
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(ProjectType::class);
     }
+
     public function members()
     {
         return $this->belongsToMany(User::class, 'project_members', 'project_id', 'user_id')
             ->withPivot('project_role')
             ->withTimestamps();
     }
-    public function type()
-    {
-        return $this->belongsTo(ProjectType::class, "type_id");
-    }
 
     public function tasks()
     {
         return $this->hasMany(Task::class);
     }
-    public function accessTokens()
+
+    public function comments()
     {
-        return $this->hasMany(ClientAccessToken::class, 'project_id');
+        return $this->hasMany(ProjectComment::class);
     }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

@@ -12,14 +12,13 @@ class ProjectType extends Model
         "description",
     ];
 
-
     public function projects()
     {
-        return $this->hasMany(Project::class, "type_id");
+        return $this->hasMany(Project::class);
     }
 
     public function taskTemplates()
     {
-        return $this->hasMany(TaskTemplate::class, "project_type_id");
+        return $this->hasMany(TaskTemplate::class);
     }
 }

@@ -15,22 +15,22 @@ return new class extends Migration {
             $table->string('name');
             $table->text('description')->nullable();
             $table->enum('status', ['pending', 'in_progress', 'completed', 'on_hold'])
-                ->default('pending')
+                ->nullable()
                 ->index();
             $table->date('start_date')
                 ->nullable();
             $table->date('end_date')
                 ->nullable();
-            $table->foreignId('owner_id')
+            $table->foreignId('client_id')
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('type_id')->nullable()->constrained('project_types')->nullOnDelete();
+            $table->foreignId('project_type_id')->nullable()->constrained('project_types')->nullOnDelete();
             $table->softDeletes();
             $table->timestamps();
 
-            $table->index('owner_id');
+            $table->index('client_id');
         });
     }
 

@@ -20,5 +20,11 @@ class AdminSeeder extends Seeder
             'password' => Hash::make('khalil123'),
             'global_role' => 'admin'
         ]);
+        User::create([
+            'name' => 'khalil client',
+            'email' => 'admin1@gmail.com',
+            'password' => Hash::make('khalil123'),
+            'global_role' => 'client'
+        ]);
     }
 }
