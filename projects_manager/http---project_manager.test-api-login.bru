@@ -1,0 +1,32 @@
+meta {
+  name: http://project_manager.test/api/login
+  type: http
+  seq: 8
+}
+
+post {
+  url: http://project_manager.test/api/admin/projects
+  body: json
+  auth: bearer
+}
+
+headers {
+  Referer: http://project_manager.test/
+  Cookie: laravel_session=eyJpdiI6IlJpT2ZLSXV1eGpZcXR1ZW5YVFUzTlE9PSIsInZhbHVlIjoieUpJdURCbzFQbGU1b3V0S0NvU0tEN0xqL0pXelYwM1RCTlU3dy8zYnJ6cThoZGRNd2ZMQVB1bFdmOFhjc29MbEVZTjdncW11alMzRGx4bzRSTkg0YUErYVpNS1NVRHpHSnp4cjB3SmM5UVhpa2gyM0JBczJreHBvZE9rZW53VHIiLCJtYWMiOiI1N2NlZGU0MDMzMjgyNWRlYTZhODY5M2UxNzU5MzdjMmVlMDNhMjM2YzdmNWNkNjdiYzZjNGZhOWM2MzU5NWI3IiwidGFnIjoiIn0
+}
+
+auth:bearer {
+  token: 20|8b41CgA2Z1F4OIMUW1Rfbizs9LeBXk4RebPzX1Pe107fa09b
+}
+
+body:json {
+  {
+     "name": "My New Project 3",
+    "description":"dsfh"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

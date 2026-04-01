@@ -1,0 +1,35 @@
+meta {
+  name: delete user
+  type: http
+  seq: 7
+}
+
+delete {
+  url: http://project_manager.test/api/admin/users?name=fdsqf&email=dd@gmail.com&global_role=client
+  body: json
+  auth: bearer
+}
+
+params:query {
+  name: fdsqf
+  email: dd@gmail.com
+  global_role: client
+}
+
+auth:bearer {
+  token: 6|MSSDF7W5hGdBtKOUSbmj6G7FQcTVqFPINldtJpGH3a4018c8
+}
+
+body:json {
+  {
+    "name": "fdsqf",
+    
+    "email": "dd@gmail.com",
+    
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

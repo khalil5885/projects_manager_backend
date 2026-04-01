@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: 127.0.0.1:8000/admin/users
+  url: http://project_manager.test/api/admin/users
   body: json
   auth: bearer
 }
@@ -17,14 +17,14 @@ headers {
 }
 
 auth:bearer {
-  token: eyJpdiI6ImRiVWJTTzZMV2ZuOXllcXFId0R2WXc9PSIsInZhbHVlIjoibTV2RE01ci9Oc0J0bm9qQmNxY3pMKzBucEQrVEY5aGRVczJqZWxRTTRtQThXMFNkVkwya01qSWw5b3U4UDdPUmV5MGtMYldoVHFHdW9vR2l1Q1EwZms4alR2VXJYMnhRVXBRNWUybHV3TGZDenY1TmpQYjJiNGViWUJNTjA4L2oiLCJtYWMiOiJjNDYyOGZlY2MyZTFlODNkNTJlOTYxOGM2ZjU5MDhlZTRmNWRmMGE5MTk3MzEyYTdiNmYwMzZhY2Q2MzA4YTcxIiwidGFnIjoiIn0%3D
+  token: eyJpdiI6IjJBVGI3clhGc0VPWlJ2SlJ3M3J5Mmc9PSIsInZhbHVlIjoiUVRoRFEyUm1velVDQ1ZMbEZDQ0lHbXd2TmMrb1NsbFBiMnlpWjFEUDhCK29YdzVqWHQxZ1RMV2pmaE1jR2tLeVpua2p1eEVTWXpGR1ZVbGU1aWNpOVVQczFCZzNxOSt3Q0pLa1RIeXVCYW1QM1piVGxtTkkrV0lzTHpGMnBOZTQiLCJtYWMiOiI2OWJjYzFiMjRjMTFhNTRhYTRlNWYyZTA4MTkwNTk5YzA2MTViODIwNTkwZDlhYzVmNjVlZTdjNGNkNTY0ZTliIiwidGFnIjoiIn0
 }
 
 body:json {
   {
     "name": "alil",
     "email": "ai.y01@gmail.com",
-    "role": "employee"
+    "global_role": "employee"
   }
   
 }

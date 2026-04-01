@@ -1,0 +1,27 @@
+meta {
+  name: task_update
+  type: http
+  seq: 13
+}
+
+patch {
+  url: http://project_manager.test/api/employee/tasks/1/status
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: 31|3KKiCghqjaEpxnwGjfTxgcWnUDseMRXtN6MLsTvr68d6ea3d
+}
+
+body:json {
+  {
+      "status": "review",
+      
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

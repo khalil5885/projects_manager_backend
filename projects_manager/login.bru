@@ -5,25 +5,23 @@ meta {
 }
 
 post {
-  url: http://127.0.0.1:8000/login
+  url: http://project_manager.test/api/login
   body: json
-  auth: inherit
+  auth: bearer
 }
 
 headers {
   Accept: application/json
-  X-Requested-With: XMLHttpRequest
   Content-Type: application/json
-  X-Inertia: 
   Authorization: 
 }
 
 body:json {
   {
     
-    "email": "admin231@gmail.com",
-    "password": "khalil123",
-    "password_confirmation": "khalil123"
+    "email": "f@gmail.com",
+    "password": "dhIKfwZs5OK9",
+    "password_confirmation": "dhIKfwZs5OK9"
   }
 }
 

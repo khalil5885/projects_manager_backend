@@ -1,0 +1,41 @@
+meta {
+  name: project_create
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://project_manager.test/api/admin/projects
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+  X-Requested-With: XMLHttpRequest
+  Content-Type: application/json
+  Cookie: laravel_session=eyJpdiI6Iml1WFdoWU5ESHpQWDkweUJmY3NlMmc9PSIsInZhbHVlIjoiYlBremN3czBld3FUNld4MGVqNDgweTFjak5RNU1nbytWVjdPRjZ6eHkvVEZ6VS9FK2wvNU5FdXNuRW5BT2MxaTcxdGdMRUM5MWREWEg3RnBydjR4NzVMSHlPTC9FWWFVNkVaQ3hheUhTZmxiOHhESVo1bUhKVUFIekxsVXozRUciLCJtYWMiOiI2MDczNWU2YjZjMTc1ODg2MTdlNzlhODAwZmFlMTYzYThiZGI3ZmQwNGFiYTk3YzMwMTFmYzcxOGI4OTJjMjZlIiwidGFnIjoiIn0
+  Referer: http://project_manager.test/
+}
+
+auth:bearer {
+  token: 3|mKCOJ4WLpMevlqSSNDGm07r1uHvQIHMobiI81yMP0fc6890b
+}
+
+body:json {
+  {
+    "user_id":"1",
+    "client_id":"2",
+    "project_type_id":"1",
+    "name": "My New  ",
+    "status": "completed",
+    "description": "This is a test project from Bruno",
+    "start_date": "2024-03-12",
+    "end_date": "2024-12-31"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,32 @@
+meta {
+  name: create_task
+  type: http
+  seq: 11
+}
+
+post {
+  url: http://project_manager.test/api/admin/d/
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: 8b41CgA2Z1F4OIMUW1Rfbizs9LeBXk4RebPzX1Pe107fa09b
+}
+
+body:json {
+  {
+      "title": "Develop Login Component",
+      "description": "Create a responsive",
+      "project_id": 1,
+      "assigned_to":3,
+      "status": "todo",
+      "priority": "medium",
+      "due_date": "2026-04-15"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
