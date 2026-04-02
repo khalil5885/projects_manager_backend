@@ -1,23 +1,20 @@
 # Project Manager - Development Plan & Progress
 
-**Project Type:** Laravel 11 Application with React/Inertia.js Frontend  
-**Current Date:** February 20, 2026  
-**Status:** In Development
+**Project Type:** Laravel 11 + Inertia.js + React SPA  
+**Current Date:** March 6, 2026  
+**Status:** In Development — Models Complete, Controllers Next
 
 ---
 
 ## Project Overview
 
-This is a comprehensive Project Management System built with Laravel 11 backend and React/Inertia.js frontend. The application allows users to manage projects, tasks, and team members with role-based access control.
+A comprehensive role-based Project Management System. Admin manages everything, employees work on assigned tasks, clients get read-only access to their projects via secure time-limited links.
 
-### Core Features
+### Stack
 
-- User Authentication & Authorization
-- Project Management
-- Task Management
-- Team Member Management
-- Admin User Management
-- Role-Based Access Control
+- **Backend:** Laravel 11, MySQL, Laravel Breeze (session auth)
+- **Frontend:** React 19, Inertia.js, Tailwind CSS, Vite
+- **Dev Tools:** Laravel Herd, DBngin, Mailtrap
 
 ---
 
@@ -25,455 +22,261 @@ This is a comprehensive Project Management System built with Laravel 11 backend 
 
 ### Tables & Relationships
 
-#### 1. **Users Table**
+#### 1. users
 
-- `id` (Primary Key)
-- `name` (string)
-- `email` (string, unique)
-- `email_verified_at` (timestamp, nullable)
-- `password` (string)
-- `role` (string, default: 'employee') - **Options:** admin, employee, customer
-- `remember_token`
-- `timestamps`
+- `id`, `name`, `email`, `password`, `global_role` ENUM(admin, employee, client), `remember_token`, `timestamps`
+- **Relationships:** ownedProjects (hasMany), memberProjects (belongsToMany via project_members), assignedTasks (hasMany), taskComments (hasMany), projectComments (hasMany), accessTokens (hasMany)
 
-**Relationships:**
+#### 2. projects
 
-- Has Many Projects
-- Has Many ProjectMembers
+- `id`, `name`, `description`, `status` ENUM(pending, in_progress, completed, on_hold), `start_date`, `end_date`, `owner_id` FK→users, `created_by` FK→users, `type_id` FK→project_types, `deleted_at`, `timestamps`
+- **Relationships:** owner (belongsTo), creator (belongsTo), type (belongsTo), members (belongsToMany via project_members), tasks (hasMany), comments (hasMany), accessTokens (hasMany)
 
----
+#### 3. project_types
 
-#### 2. **Projects Table**
+- `id`, `name`, `description`, `timestamps`
+- **Relationships:** projects (hasMany), taskTemplates (hasMany)
 
-- `id` (Primary Key)
-- `name` (string)
-- `description` (text, nullable)
-- `status` (enum) - **Options:** pending, active, completed
-- `start_date` (date)
-- `end_date` (date)
-- `timestamps`
+#### 4. task_templates
 
-**Relationships:**
+- `id`, `project_type_id` FK→project_types, `title`, `description`, `default_due_days`, `order`, `timestamps`
+- **Relationships:** projectType (belongsTo)
+- **Purpose:** Auto-generate tasks when a project of this type is created
 
-- Belongs To User (created_by)
-- Has Many Tasks
-- Has Many ProjectMembers
+#### 5. tasks
 
----
+- `id`, `project_id` FK→projects, `title`, `description`, `status` ENUM(todo, in_progress, review, done), `priority` ENUM(low, medium, high), `assigned_to` FK→users, `due_date`, `deleted_at`, `timestamps`
+- **Relationships:** project (belongsTo), assignedTo (belongsTo), comments (hasMany)
 
-#### 3. **Tasks Table**
+#### 6. task_comments
 
-- `id` (Primary Key)
-- `name` (string)
-- `description` (text)
-- `project_id` (foreign key → projects)
-- `status` (enum) - **Options:** pending, active, completed
-- `start_date` (date)
-- `end_date` (date)
-- `timestamps`
+- `id`, `task_id` FK→tasks, `user_id` FK→users, `type` ENUM(note, question, update), `body`, `timestamps`
 
-**Relationships:**
+#### 7. project_comments
 
-- Belongs To Project
+- `id`, `project_id` FK→projects, `user_id` FK→users, `type` ENUM(evaluation, change_request, general), `body`, `timestamps`
 
----
+#### 8. project_members
 
-#### 4. **Project Members Table**
+- `id`, `project_id` FK→projects, `user_id` FK→users, `project_role` ENUM(manager, developer, viewer), `timestamps`
+- **Unique:** (project_id, user_id)
 
-- `id` (Primary Key)
-- `project_id` (foreign key → projects, cascade delete)
-- `user_id` (foreign key → users, cascade delete)
-- `role` (string) - Project-specific role
-- `timestamps`
+#### 9. client_access_tokens
 
-**Relationships:**
+- `id`, `client_id` FK→users, `project_id` FK→projects, `token` (unique), `expires_at`, `last_used_at`, `timestamps`
+- **Purpose:** One-time expirable links for client read-only project access (like Discord invite)
 
-- Belongs To Project
-- Belongs To User
+#### 10. notifications
 
----
-
-#### 5. **Additional Built-in Tables**
-
-- `password_reset_tokens` - For password recovery
-- `sessions` - For session management
-- `cache` - For caching
-- `jobs` - For queued jobs
-- `personal_access_tokens` - For Sanctum API authentication
+- Laravel built-in polymorphic structure: `id` (UUID), `type`, `notifiable_type`, `notifiable_id`, `data` (JSON), `read_at`, `timestamps`
 
 ---
 
 ## Completed Features ✅
 
-### 1. Database Setup
+### Database
 
-- [x] Users table with role column
-- [x] Projects table with status and dates
-- [x] Tasks table with project relationship
-- [x] ProjectMembers table (pivot/team table)
-- [x] All migrations created and organized by date
+- [x] All 10 migrations created, ordered correctly, and verified
+- [x] global_role enum built into users table (no separate migration)
+- [x] project_types runs before projects (FK dependency resolved)
+- [x] SoftDeletes on projects and tasks
+- [x] migrate:fresh --seed working cleanly
 
-### 2. Eloquent Models
+### Models (all complete)
 
-- [x] User model with relationships
-    - `projects()` - hasMany
-    - `projectMembers()` (implied for future use)
-- [x] Project model with relationships
-    - `user()` - belongsTo
-    - `tasks()` - hasMany
-- [x] Task model with relationships
-    - `project()` - belongsTo
-- [x] ProjectMember model created
+- [x] User — fillable, casts, role helpers (isAdmin/isEmployee/isClient), all relationships
+- [x] Project — SoftDeletes, fillable, casts, owner/creator/type/members/tasks/comments/tokens
+- [x] Task — SoftDeletes, fillable, project/assignedTo/comments
+- [x] TaskComment — fillable, user/task
+- [x] ProjectComment — fillable, user/project
+- [x] ProjectMember — fillable, user/project
+- [x] ProjectType — fillable, projects/taskTemplates
+- [x] TaskTemplate — fillable, projectType
+- [x] ClientAccessToken — fillable, casts, isValid() helper, client/project
 
-### 3. Authentication System
+### Authentication
 
-- [x] Login (with middleware check for guests)
-- [x] Registration (admin-only)
-- [x] Password Reset
-- [x] Email Verification
-- [x] Logout
-- [x] Password Change
-- [x] Session Management
-- [x] Sanctum API Authentication
+- [x] Laravel Breeze session-based auth
+- [x] Login / Logout
+- [x] Profile edit/update/delete
+- [x] Post-login redirect by global_role
 
-### 4. Authorization & Gates
+### Middleware & Authorization
 
-- [x] Role-based access control (admin-only gate)
+- [x] EnsureRole middleware created and registered in bootstrap/app.php
+- [x] role:admin protecting all /admin routes
+- [x] role:employee protecting /employee routes
+- [x] role:client protecting /client routes
 
-### 5. Admin Features
+### Admin — Users
 
-- [x] Admin user creation endpoint: `POST /admin/users`
-    - Validates: name, email, role (employee/customer)
-    - Auto-generates 12-character password
-    - Sends welcome email to 'kablouti.fady01@gmail.com'
-    - Returns JSON response
+- [x] List users (paginated)
+- [x] Create user form
+- [x] Store user (auto-generates password, sends welcome email via Mailtrap)
+- [x] global_role correctly saved (admin creates employee or client accounts)
 
-### 6. Email Features
+### Routes
 
-- [x] WelcomeUserMail class created
-- [x] Mail queue setup for async sending
+- [x] Admin group: /admin prefix, role:admin middleware
+- [x] Employee group: /employee prefix, role:employee middleware
+- [x] Client group: /client prefix, role:client middleware
+- [x] Dashboard redirects by role after login
+- [x] Profile routes for all authenticated users
 
-### 7. Frontend Setup
+### Frontend
 
-- [x] Inertia.js integration
-- [x] React 19 with Vite bundler
-- [x] Pages directory structure created
-    - `/Auth` - Authentication pages
-    - `/Profile` - User profile pages
-    - `/Dashboard` - Dashboard (WIP)
-    - `/Welcome` - Landing page (commented out)
+- [x] Inertia.js + React SPA architecture
+- [x] AuthenticatedLayout
+- [x] UserIndex page (paginated user list, + New User button)
+- [x] UserCreate page (name, email, role selector, auto-password info)
+- [x] Role-based UI (isAdmin check via auth.user.global_role)
 
-### 8. Routes
+### Seeder
 
-- [x] Auth routes (login, register, forgot-password, reset-password, verify-email, logout)
-- [x] Web routes with admin prefix for user management
-- [x] API routes with Sanctum middleware for `/user` endpoint
-- [x] CORS configuration available
-
-### 9. Development Tools
-
-- [x] Vite for asset bundling
-- [x] Pest for testing framework setup
-- [x] PHPUnit for unit tests
+- [x] AdminSeeder — creates default admin account
 
 ---
 
-## Current Architecture
-
-### Backend Stack
-
-- **Framework:** Laravel 11
-- **Database:** MySQL/SQLite
-- **Authentication:** Laravel Sanctum + Sessions
-- **Mail:** Queue-based with notification mailing
-- **Testing:** Pest PHP
-
-### Frontend Stack
-
-- **Framework:** React 19
-- **Server-Side Rendering:** Inertia.js
-- **Build Tool:** Vite
-- **Package Manager:** NPM
-
-### API Design
-
-- Currently hybrid: Web routes + API routes
-- Uses Inertia.js for server-side rendering with React
-
----
-
-## Role Definitions
-
-### User Roles
-
-1. **admin** - Full system access, can create users, manage projects
-2. **employee** - Can participate in projects, create tasks
-3. **customer** - Limited access, view-only permissions (to be implemented)
-
----
-
-## API Endpoints (Current)
-
-### Authentication Routes
+## Controllers Structure
 
 ```
-GET    /auth/login              - Login page
-POST   /auth/login              - Submit login
-GET    /auth/register           - Register page (admin-only)
-POST   /auth/register           - Submit registration
-GET    /auth/forgot-password    - Forgot password page
-POST   /auth/forgot-password    - Send reset link
-GET    /auth/reset-password/{token} - Reset password page
-POST   /auth/reset-password     - Submit new password
-GET    /auth/verify-email       - Email verification prompt
-GET    /auth/verify-email/{id}/{hash} - Verify email
-POST   /auth/email/verification-notification - Resend verification
-GET    /auth/confirm-password   - Confirm password page
-POST   /auth/confirm-password   - Submit password confirmation
-PUT    /auth/password           - Update password
-POST   /auth/logout             - Logout
+app/Http/Controllers/
+├── Admin/
+│   ├── UserController.php          ✅ index, create, store
+│   ├── ProjectController.php       ← index, create, store, show, edit, update, destroy
+│   ├── TaskController.php          ← index, create, store, show, edit, update, destroy
+│   ├── ProjectTypeController.php   ← index, create, store, edit, update, destroy
+│   └── TaskTemplateController.php  ← index, create, store, edit, update, destroy
+├── Employee/
+│   ├── DashboardController.php     ← index
+│   └── TaskController.php          ← index, show, updateStatus, addComment
+└── Client/
+    ├── ProjectController.php       ← show
+    └── TokenAccessController.php   ← access, addComment
 ```
-
-### Admin Routes
-
-```
-POST   /admin/users             - Create new user (admin-only)
-```
-
-### API Routes
-
-```
-GET    /api/user                - Get authenticated user (Sanctum)
-```
-
-### Web Routes
-
-```
-GET    /profile                 - User profile page
-PATCH  /profile                 - Update profile
-DELETE /profile                 - Delete account
-```
-
----
-
-## Seeders & Initial Data
-
-### Seeded Data
-
-- **AdminSeeder** creates default admin user:
-    - Email: `admin231@gmail.com`
-    - Password: `khalil123`
-    - Role: `admin`
-    - Name: `khalil admin`
 
 ---
 
 ## Not Yet Implemented ❌
 
-### Core Features Still TODO
+### Controllers
 
-- [ ] Projects API endpoints (CRUD)
-- [ ] Tasks API endpoints (CRUD)
-- [ ] Project Members management
-- [ ] Task assignment to team members
-- [ ] User editing/deletion endpoints (beyond profile)
-- [ ] Project status workflow validation
-- [ ] Task dependency management
-- [ ] Real-time notifications
+- [ ] Admin/ProjectController — full CRUD
+- [ ] Admin/TaskController — full CRUD
+- [ ] Admin/ProjectTypeController — full CRUD
+- [ ] Admin/TaskTemplateController — full CRUD
+- [ ] Admin/UserController — update, destroy
+- [ ] Employee/DashboardController
+- [ ] Employee/TaskController
+- [ ] Client/ProjectController
+- [ ] Client/TokenAccessController
 
-### Frontend Pages TODO
+### Features
 
-- [ ] Dashboard with statistics/overview
-- [ ] Projects listing and detail pages
-- [ ] Project creation/editing forms
-- [ ] Task management interface
-- [ ] Team member management UI
-- [ ] User profile page implementation
-- [ ] Admin user management panel
+- [ ] Task auto-generation on project creation (via task_templates)
+- [ ] Project member assignment
+- [ ] Client access token generation & email sending
+- [ ] Notifications on task/project assignment
+- [ ] Employee dashboard (assigned tasks/projects)
+- [ ] Client read-only project view via token link
 
-### Authorization & Validation TODO
+### Frontend Pages
 
-- [ ] Project ownership verification
-- [ ] Task assignment authorization
-- [ ] Team member role-based actions
-- [ ] Customer role permissions
-- [ ] Middleware for role checks
+- [ ] Admin: Projects (index, create, show, edit)
+- [ ] Admin: Tasks (index, create, show, edit)
+- [ ] Admin: Project Types + Task Templates
+- [ ] Employee: Dashboard, Task list, Task detail
+- [ ] Client: Project view (read-only)
 
-### Testing TODO
+### Testing
 
 - [ ] Unit tests for models
 - [ ] Feature tests for auth
-- [ ] API endpoint tests
+- [ ] Controller tests
 - [ ] Authorization tests
 
-### Additional Features TODO
+---
 
-- [ ] Project templates
-- [ ] Task priority levels
-- [ ] File attachments
-- [ ] Activity logging
-- [ ] Project reports/analytics
-- [ ] Email notifications for tasks
-- [ ] User invitations
-- [ ] Two-factor authentication
+## Next Steps (in order)
+
+1. **Admin/ProjectController** — index, create, store, show, edit, update, destroy
+2. **Add projects routes** to web.php
+3. **React pages** for projects (Index, Create, Show)
+4. **Admin/TaskController** — CRUD within a project
+5. **ProjectType + TaskTemplate controllers** — for automation
+6. **Task auto-generation** logic in ProjectController@store
+7. **Employee controllers** — dashboard + task updates
+8. **Client controllers** — read-only view + token access
+9. **Notifications** — on assignment events
 
 ---
 
-## File Structure Summary
+## Architecture Reminder
 
 ```
-project_manager/
-├── app/
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   │   ├── Admin/       (Admin-only functionality)
-│   │   │   ├── Auth/        (Authentication controllers)
-│   │   │   └── *.php        (Other controllers)
-│   │   └── Middleware/      (Custom middlewares)
-│   ├── Mail/
-│   │   └── WelcomeUserMail.php
-│   └── Models/              (Eloquent models: User, Project, Task, ProjectMember)
-├── database/
-│   ├── migrations/          (Schema definitions)
-│   └── seeders/             (Database seeders)
-├── resources/
-│   ├── js/
-│   │   ├── Components/      (React components)
-│   │   ├── Layouts/         (Layout components)
-│   │   └── Pages/           (Page components)
-│   └── css/                 (Stylesheets)
-├── routes/                  (API, web, auth routes)
-├── tests/                   (Test files)
-└── config/                  (Configuration files)
+Browser Request
+     ↓
+Laravel Router → Middleware (auth, role check)
+     ↓
+Controller → Inertia::render('PageName', ['data' => $data])
+     ↓
+React Component renders with props
+     ↓
+Browser (SPA, no full reload)
 ```
 
----
-
-## Next Steps Priority
-
-### High Priority
-
-1. Implement Projects CRUD API endpoints
-2. Implement Tasks CRUD API endpoints
-3. Create Project management frontend pages
-4. Add authorization checks for project access
-5. Implement task assignment
-
-### Medium Priority
-
-6. Create admin panel for user management UI
-7. Implement ProjectMembers management
-8. Add project status workflow validation
-9. Create unit tests for models
-10. Add feature tests for CRUD operations
-
-### Low Priority
-
-11. Email notifications
-12. Activity logging
-13. Project templates
-14. Advanced analytics
+- No manual fetch() for page navigation — use Inertia Link
+- No JWT — session-based auth via Breeze
+- Forms use Inertia useForm hook (post/patch/delete)
+- route() helper available in React via Ziggy
 
 ---
 
-## Recent Changes Log
-
-### February 21, 2026 - Auth Cleanup & Planning
-
-- **Removed RegisteredUserController** from auth routes (redundant with admin-only UserController)
-- **Cleaned up auth.php** - Now only contains public authentication flows (login, password reset, email verify, logout)
-- **Identified auth gaps** - MustVerifyEmail interface and role field handling for future implementation
-- **Route organization clarified** - auth.php for auth, web.php for app routes, api.php for optional JSON endpoints
-
-### February 20, 2026 - Bug Fixes & Code Review
-
-- **Fixed User Model:** Changed `casts()` method to `protected $casts` property
-    - Issue: Eloquent was ignoring the method; mass assignment and casting not working
-    - This ensures password hashing and email_verified_at datetime casting apply correctly
-- **Fixed task_employees Migration:** Corrected pivot table structure
-    - Removed incorrect `project_id` column
-    - Added proper `user_id` foreign key to establish Task ↔ User many-to-many relationship
-    - Added foreign key constraints with cascade delete for referential integrity
-    - Added unique composite key `(task_id, user_id)` to prevent duplicate assignments
-- **Code Review:** All models and migrations validated for consistency and correctness
-
-### February 19-20, 2026
-
-- Created ProjectMembers table for team management
-- Finalized database schema with all four core tables
-- Set up role-based authorization with admin-only gates
-- Implemented admin user creation with auto-generated passwords
-- Configured mail queue for welcome emails
-- Established Inertia.js + React frontend setup
-- Created basic route structure for authentication and admin panel
-
----
-
-## TODO - Tomorrow (February 22, 2026)
-
-### High Priority - Start Here
-
-- [ ] Implement Projects CRUD API endpoints
-    - POST `/projects` - Create new project
-    - GET `/projects` - List user's projects
-    - GET `/projects/{id}` - Get project details
-    - PUT `/projects/{id}` - Update project
-    - DELETE `/projects/{id}` - Delete project
-- [ ] Implement Tasks CRUD API endpoints
-    - POST `/projects/{projectId}/tasks` - Create task
-    - GET `/projects/{projectId}/tasks` - List tasks
-    - GET `/tasks/{id}` - Get task details
-    - PUT `/tasks/{id}` - Update task
-    - DELETE `/tasks/{id}` - Delete task
-- [ ] Add authorization checks
-    - Users can only access/modify own projects
-    - Users can only manage tasks in projects they belong to
-
-### Medium Priority - After CRUD Works
-
-- [ ] Create Project management frontend pages
-- [ ] Implement ProjectMembers management endpoints
-- [ ] Add project status workflow validation
-
----
-
-## Development Status
+## Development Progress
 
 ```
-Database Schema:      ████████████████████ 100%
-Models:              ████████████████████ 100%
-Authentication:      ███████████████████░ 95%
-Admin Features:      ███████░░░░░░░░░░░░ 30%
-API Endpoints:       ███░░░░░░░░░░░░░░░░ 10%
-Frontend Setup:      ████████░░░░░░░░░░░ 40%
-Frontend Pages:      ██░░░░░░░░░░░░░░░░░ 10%
-Authorization:       ████░░░░░░░░░░░░░░░ 15%
-Testing:             ░░░░░░░░░░░░░░░░░░░ 0%
+Database Migrations:    ████████████████████ 100%
+Eloquent Models:        ████████████████████ 100%
+Authentication:         ████████████████████ 100%
+Middleware/Auth:        ████████████████████ 100%
+Admin Users CRUD:       ████████████░░░░░░░░  60% (missing update/destroy)
+Admin Projects CRUD:    ░░░░░░░░░░░░░░░░░░░░   0%
+Admin Tasks CRUD:       ░░░░░░░░░░░░░░░░░░░░   0%
+Project Types/Templates:░░░░░░░░░░░░░░░░░░░░   0%
+Employee Features:      ░░░░░░░░░░░░░░░░░░░░   0%
+Client Features:        ░░░░░░░░░░░░░░░░░░░░   0%
+Frontend Pages:         ████░░░░░░░░░░░░░░░░  20%
+Testing:                ░░░░░░░░░░░░░░░░░░░░   0%
 ```
 
 ---
 
-**Last Updated:** February 20, 2026  
-**Status:** Ready for API endpoint implementation phase
+**Last Updated:** March 6, 2026  
+**Last Commit:** feat: complete all models and controller structure
 
-1. Routes (URL design) → What URLs exist?
-2. Controllers → What handles each URL?
-3. Requests (validation) → What input is allowed?
-4. Resources (responses) → What output format?
-5. Tests → Does it all work?
-
-## Methods needed per controller:
-
-```
-Admin/ProjectController     → index, create, store, show, edit, update, destroy
-Admin/TaskController        → index, create, store, show, edit, update, destroy
-Admin/ProjectTypeController → index, create, store, edit, update, destroy
-Admin/TaskTemplateController → index, create, store, edit, update, destroy
-Admin/UserController        → index, create, store (already built)
-
-Employee/DashboardController → index
-Employee/TaskController      → index, show, updateStatus, addComment
-
-Client/ProjectController     → show
-Client/TokenAccessController → access, addComment
-```
+Pages/
+├── Admin/
+│ ├── Projects/
+│ │ ├── Index.jsx ← list all projects
+│ │ ├── Create.jsx ← create project form
+│ │ ├── Show.jsx ← project detail
+│ │ └── Edit.jsx ← edit project form
+│ ├── Tasks/
+│ │ ├── Index.jsx
+│ │ ├── Create.jsx
+│ │ ├── Show.jsx
+│ │ └── Edit.jsx
+│ ├── ProjectTypes/
+│ │ ├── Index.jsx
+│ │ └── Create.jsx
+│ └── TaskTemplates/
+│ ├── Index.jsx
+│ └── Create.jsx
+├── Employee/
+│ ├── Dashboard.jsx
+│ └── Tasks/
+│ ├── Index.jsx
+│ └── Show.jsx
+└── Client/
+└── Projects/
+└── Show.jsx

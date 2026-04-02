@@ -19,7 +19,7 @@ class WelcomeUserMail extends Mailable
      */
     public function __construct(
         public User $user,
-        public string $password
+        public string $token
     ) {}
 
     /**

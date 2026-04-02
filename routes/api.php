@@ -10,11 +10,16 @@ use App\Http\Controllers\Employee\TaskController as EmployeeTaskController;
 use App\Http\Controllers\Employee\DashboardController;
 use App\Http\Controllers\Client\ProjectController as ClientProjectController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\SetupPasswordController;
 
 // ── Public Auth Routes ────────────────────────────────────
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::get('/user', [AuthController::class, 'user'])->middleware('auth:sanctum');
+
+
+Route::post('/setup-password/verify', [SetupPasswordController::class, 'verify']);
+Route::post('/setup-password', [SetupPasswordController::class, 'setup']);
 
 // ── Admin Role Routes ─────────────────────────────────────
 Route::middleware(['auth:sanctum', 'role:admin'])

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Password;
 
 class UserController extends Controller
 {
@@ -38,8 +39,11 @@ class UserController extends Controller
             'email'       => $request->email,
             'global_role' => $request->global_role,
             'password'    => Hash::make($password),
+            'password_changed' => false,
+
         ]));
 
+        $token = Password::broker()->createToken($user);
         Mail::to($user->email)->send(new WelcomeUserMail($user, $password));
 
         return response()->json([

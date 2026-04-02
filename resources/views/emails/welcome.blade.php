@@ -1,18 +1,16 @@
 <x-mail::message>
-# Welcome, {{ $user->name }}!
+    # Welcome, {{ $user->name }}!
 
-An account has been created for you on the Project Manager platform.
+    Your account has been created on the **{{ config('app.name') }}** platform.
 
-**Your Login Credentials:**
-* **Email:** {{ $user->email }}
-* **Temporary Password:** {{ $password }}
+    Click the button below to set your password. This link expires in **3 days**.
 
-Please login and change your password as soon as possible.
+    <x-mail::button :url="config('app.frontend_url') . '/setup-password?token=' . $token . '&email=' . urlencode($user->email)">
+        Set Your Password
+    </x-mail::button>
 
-<x-mail::button :url="config('app.url') . '/login'">
-Login to Your Account
-</x-mail::button>
+    If you did not expect this email, you can ignore it.
 
-Thanks,<br>
-{{ config('app.name') }}
+    Thanks,
+    {{ config('app.name') }}
 </x-mail::message>
